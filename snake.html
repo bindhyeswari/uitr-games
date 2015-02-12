@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Snake Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        div.container {
+            height: 75vh;
+            width: 75vw;
+            background-color: #eee;
+            margin: 12.5vh auto;
+            position: relative;
+        }
+        div.block {
+            height: 15px;
+            width: 15px;
+            background-color: #777;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            border: 1px solid white;
+        }
+    </style>
+    <script>
+        function Snake(initialElement) {
+            this.elements = [initialElement];
+            this.direction = this.dir.right;
+            this.currpos = [1, 1];
+            var snake = this;
+            this.start();
+        }
+
+        Snake.prototype.dir = {
+            left: [-15, 0],
+            top: [0, -15],
+            right: [15, 0],
+            bottom: [0, 15]
+        };
+
+        Snake.prototype.move = function () {
+            for (var i = 0; i < 2; i++) {
+                this.currpos[i] = this.direction[i] + this.currpos[i];
+            }
+            var lastElement = this.elements.pop();
+            this.elements.unshift(lastElement);
+
+            lastElement.style.left = this.currpos[0] + 'px';
+            lastElement.style.top = this.currpos[1] + 'px';
+        };
+
+        Snake.prototype.add = function () {
+            var newblock = document.createElement('div');
+            newblock.id = 'add';
+            newblock.className = 'block';
+            document.querySelector('div.container').appendChild(newblock);
+            this.elements.push(newblock);
+        };
+
+        Snake.prototype.pause = function () {
+            clearInterval(this.intervalid);
+            this.isPaused = true;
+        };
+        Snake.prototype.start = function () {
+            var snake = this;
+            this.intervalid = setInterval(function () {
+                snake.move();
+            }, 100);
+            this.isPaused = false;
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var snake = new Snake(document.querySelector('div.block'));
+            document.addEventListener('keydown', function (event) {
+                console.log(event.keyCode);
+                switch (event.keyCode) {
+                    case 37: // left
+                        snake.direction = snake.direction === snake.dir.right ? snake.dir.right : snake.dir.left;
+                        break;
+                    case 38: // top
+                        snake.direction = snake.direction === snake.dir.bottom ? snake.dir.bottom : snake.dir.top;
+                        break;
+                    case 39: // right
+                        snake.direction = snake.direction === snake.dir.left ? snake.dir.left : snake.dir.right;
+                        break;
+                    case 40: // bottom
+                        snake.direction = snake.direction === snake.dir.top ? snake.dir.top : snake.dir.bottom;
+                        break;
+                    case 32: // pause or start
+                        if (snake.isPaused) snake.start(); else snake.pause();
+                        break;
+                    default:
+                        snake.add();
+                        break;
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="block"></div>
+    </div>
+
+</body>
+</html>
